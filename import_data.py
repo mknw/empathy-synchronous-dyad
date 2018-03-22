@@ -16,7 +16,8 @@ from edges_update import edges_update
 
 class syncNet(object):
 
-   def __init__(self, file='data/socialtapping_V3-final.xlsx'):
+   def __init__(self, name, file='data/socialtapping_V3-final.xlsx'):
+      self.name = name
       #read excel
       template = pd.read_excel(file, [0,1])
       self.sheet1 = template[0]
@@ -173,10 +174,13 @@ class syncNet(object):
    def record_interaction(self, time=100, delta=0.2):
       dyad = self.dyad
       
-      for t in range(1, time):
+      for t in range(1, time): # OC original code
          temp_dyad = edges_update(dyad, t, delta)
          dyad = states_update(temp_dyad, t, delta)
          
+#      for t in range(1, time): # update only states
+#         dyad = states_update(dyad, t, delta)
+      print("Adaptive Timeline created for: " + str(self.name))
       self.dyad = dyad # networkx graph
       return
    
@@ -185,8 +189,11 @@ class syncNet(object):
       for node in self.dyad.nodes():
          state_tuples = self.dyad.node[node]['activityTimeLine'].items()
          plt.plot(*zip(*state_tuples))
+         
       plt.legend(self.sts_nms)
       plt.show()
+      print("Plotted vertices:")
+      print(self.sts_nms)
       return
    
    
@@ -194,18 +201,20 @@ class syncNet(object):
       plt.figure(figsize=(20, 10))
       adcon_list = []
       
-      for edge in self.dyad.nodes():
+      for edge in self.dyad.edges():
          source, target = edge
          #Select only adaptive edges based on number of attr assigned:
-         if len(self.dyad.get_edge_data(source, target)[0]) > 3:
+#         if len(self.dyad.get_edge_data(source, target)[0]) > 3:
+         if len(self.dyad[source][target][0]) > 3:
             #get items:
-            state_tuples = dyad.get_edge_data(source, target)[0]['weightTimeLine'].items()
+            state_tuples = self.dyad.get_edge_data(source, target)[0]['weightTimeLine'].items()
             #unpack them:
             plt.plot(*zip(*state_tuples))
-            adcon_list = adcon_list.append(edge)
-      
+            adcon_list.append(edge)
+            
       plt.legend(adcon_list)
       plt.show()
+      print("Plotted edges:" + str(adcon_list))
       return
 
 

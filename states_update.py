@@ -8,7 +8,7 @@ from sys import exit
 
 
 '''
-The attribute state in every node defines the last state of the node. At the dictionary activityTimeLine we have the
+The state attribute in every node defines the last state of the node. At the dictionary activityTimeLine we have the
 evolution of the values for the state over time.
 '''
 def states_update(g, t, delta = 0.2):
@@ -26,9 +26,10 @@ def states_update(g, t, delta = 0.2):
 #            weight_in = g[pred][vrtx][0]['weight'][t]
             weight_in = g.get_edge_data(pred, vrtx)[0]['weight']
             #connect = g.get_edge_data(neigh, node).values()[0]['weight']
-            sum_weights = sum_weights + weight_in
+            sum_weights += weight_in
             try:
-                aggimpact = aggimpact + g.node[pred]['activityTimeLine'][t-1]*weight_in
+#                aggimpact = aggimpact + g.node[pred]['activityTimeLine'][t-1]*weight_in
+                aggimpact = aggimpact + g.node[pred]['state']*weight_in
             except:
                 print(t, pred)
                 exit
@@ -39,6 +40,7 @@ def states_update(g, t, delta = 0.2):
         # Defining aggimpact ['id', 'sum', 'ssum', 'norsum', 'adnorsum', 'slogistic', 'alogistic', 'adalogistic']
         if 'id' in g.node[vrtx] or 'sum' in g.node[vrtx]:
             aggimpact = aggimpact
+            
         elif 'ssum' in g.node[vrtx]:
             # Use scaling_factor
             scaling_factor = g.node[vrtx]['scaling_factor']
@@ -108,21 +110,19 @@ def states_update(g, t, delta = 0.2):
             old_activity = g.node[vrtx]['state']
             new_activity = old_activity + speed_factor * (aggimpact - old_activity) * delta
             try:
-                new_activity = np.asscalar(new_activity)
+                new_activity = np.asscalar(new_activity) # for multiple predecessors
             except:
-                new_activity=new_activity
+                new_activity= new_activity
                 
-            # set dictionary keys to a meaningful output relative to
-            # the time input (Xpressd in secs)
             
             g_new.node[vrtx]['activityTimeLine'].update({t: new_activity}) #works
-            g_new.node[vrtx]['state'] = new_activity # works
+            g_new.node[vrtx]['state'] = new_activity # works #ROUND ADDED
         else:
             try:
-                actual_state = np.asscalar(g.node[vrtx]['state'])
+                current_state = np.asscalar(g.node[vrtx]['state'])
             except:
-                actual_state = g.node[vrtx]['state'] 
-            g_new.node[vrtx]['activityTimeLine'].update({t: actual_state})
+                current_state = g.node[vrtx]['state'] 
+            g_new.node[vrtx]['activityTimeLine'].update({t: current_state})
     return g_new
 
 

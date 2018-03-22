@@ -14,8 +14,8 @@ def edges_update(graph, t, delta = 0.2):
     # the time input (Xpressd in secs)
 #    t = round(t*delta, 1)
     
-    if t % 2 == 0:
-        print('Time: ', t)
+#    if t % 2 == 0:
+#        print('Time: ', t)
 
     g = graph.copy()
 #    not_changed = []
@@ -34,7 +34,12 @@ def edges_update(graph, t, delta = 0.2):
 #            function = 'hebbian' # unnecessary
             speed_factor = g[source_node][target_node][0]['speed_factor'] 
             persistence = g[source_node][target_node][0]['persistence']
+
             variation = speed_factor * (source * target * (1 - target) + persistence * target)
+            # temporarily changed to:
+            #variation = 0.5
+#            variation = speed_factor * (source * target - target**2 * old_weight) * persistence
+            
 
         elif 'slhom' in g[source_node][target_node][0]:
 #            print('slhomophily:' + source_node + target_node)
