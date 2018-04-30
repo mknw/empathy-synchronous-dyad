@@ -43,21 +43,10 @@ soc_dyad = soc_syncNet.dyad
 nonsoc_dyad = nonsoc_syncNet.dyad
 
 
-#"""edge data for keys of interest"""
-#
-#keysOI = ['hebbian', 'persistence', 'speed_factor', 'weight']
-#for k in keysOI:
-#   print(k, soc_dyad.get_edge_data('X3', 'X4')[0][k])
-#   
-#   
-#"""node data"""
-#
-#soc_dyad.node['X3']
 
 # =============================================================================
 # #   - simulations model SSR comparison
 # =============================================================================
-
 
 SSR_dict = {}
 
@@ -79,4 +68,15 @@ for vrtx in soc_dyad.nodes(): # for each vertex;
 print("Sum of Squared Residuals between simulations for each state: ")
 print(SSR_dict)
 #         
-#  - state-wise and connection-wise condition comparisons
+
+
+##"""edge data for keys of interest"""
+##
+#keysOI = ['hebbian', 'persistence', 'speed_factor', 'weight']
+#for k in keysOI:
+#   print(k, soc_dyad.get_edge_data('X3', 'X4')[0][k])
+#   
+#   
+#"""node data"""
+#
+#soc_dyad.node['X3']
