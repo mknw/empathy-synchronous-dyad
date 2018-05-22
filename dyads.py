@@ -77,7 +77,6 @@ from import_data import syncNet
 
 def ssr(soc_dyad, nonsoc_dyad):
     SSR_dict = {}
-
     for vrtx in soc_dyad.nodes():
        vrtx_SSR = 0 
        social_actTL = list(soc_dyad.node[vrtx]['activityTimeLine'].values())   
@@ -90,29 +89,52 @@ def ssr(soc_dyad, nonsoc_dyad):
     return(SSR_dict)
 
 def input_params(net, params):
-#    net.input_weights(params[0])
+    net.input_weights(params[0])
     net.input_speed_factors(params[1])
     net.input_comb_par(params[2])
-#    net.input_adcon_par(params[3])
+    net.input_adcon_par(params[3])
 
+def init_nets():
+    soc_syncNet = syncNet(name="soc_syncNet", file="data/socialtapping_V5-final.xlsx")
+    soc_syncNet.import_model()
+    soc_syncNet.build_dyad()
+    nonsoc_syncNet = syncNet(name="nonsoc_syncNet", file="data/nonsocialtapping_V5-final.xlsx")  
+    nonsoc_syncNet.import_model()
+    nonsoc_syncNet.build_dyad()
+    return(soc_syncNet,nonsoc_syncNet)
+    
+def update_net(net, params):
+    net.hardcoded_params(params)
+#    net.input_weights(params[0])
+#    net.input_speed_factors(params[1])
+#    net.input_comb_par(params[2])
+#    net.input_adcon_par(params[3])
+#    net.build_dyad()
+    net.plug_parameters()
+    net.record_interaction(time=600)
+    return net
+
+def compare_nets(net1,net2):
+    return ssr(net1.dyad,net2.dyad)
+    
 def run_nets(params):
     ## social condition
     soc_syncNet = syncNet(name="soc_syncNet", file="data/socialtapping_V5-final.xlsx")
     soc_syncNet.import_model()
-    soc_syncNet.input_weights(params[0])
-    soc_syncNet.input_speed_factors(params[1])
-    soc_syncNet.input_comb_par(params[2])
-#    input_params(soc_syncNet, params)
+#    soc_syncNet.input_weights(params[0])
+#    soc_syncNet.input_speed_factors(params[1])
+#    soc_syncNet.input_comb_par(params[2])
+    input_params(soc_syncNet, params)
     soc_syncNet.build_dyad()
     soc_syncNet.plug_parameters()
     soc_syncNet.record_interaction(time=450)
     ## nonsocial condition
     nonsoc_syncNet = syncNet(name="nonsoc_syncNet", file="data/nonsocialtapping_V5-final.xlsx")  
     nonsoc_syncNet.import_model()
-    nonsoc_syncNet.input_weights(params[0])
-    nonsoc_syncNet.input_speed_factors(params[1])
-    nonsoc_syncNet.input_comb_par(params[2])
-#    input_params(nonsoc_syncNet, params)
+#    nonsoc_syncNet.input_weights(params[0])
+#    nonsoc_syncNet.input_speed_factors(params[1])
+#    nonsoc_syncNet.input_comb_par(params[2])
+    input_params(nonsoc_syncNet, params)
     nonsoc_syncNet.build_dyad()
     nonsoc_syncNet.plug_parameters()
     nonsoc_syncNet.record_interaction(time=450) 

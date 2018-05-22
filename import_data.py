@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 from states_update import states_update
 from edges_update import edges_update
 import random
+from math import ceil
 
 class syncNet(object):
 
@@ -86,6 +87,49 @@ class syncNet(object):
       self.init_states = [float(n) for n in[1, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
       return
   
+   def hardcoded_params(self, params):
+       weights = self.weights_df
+       speed = self.speed_factors_df
+       comb = self.comb_par_df
+       adcon = self.adcon_par_df
+#       print (weights)
+       weights.loc['X2']['X4']=params[0][0]
+       weights.loc['X3']['X4']=params[0][3]
+       weights.loc['X4']['X3']=params[0][1]
+       weights.loc['X4']['X5']=params[0][2]
+       weights.loc['X5']['X7']=params[0][4]
+       weights.loc['X6']['X8']=params[0][0]
+       weights.loc['X7']['X8']=params[0][5]
+       weights.loc['X8']['X7']=params[0][2]
+       weights.loc['X8']['X9']=params[0][3]
+       weights.loc['X9']['X3']=params[0][6]
+#       print (weights)
+#       print (speed)
+       speed.loc['speed_factor']['X2']=params[1][0]
+       speed.loc['speed_factor']['X3']=params[1][1]
+       speed.loc['speed_factor']['X4']=params[1][2]
+       speed.loc['speed_factor']['X5']=params[1][3]
+       speed.loc['speed_factor']['X6']=params[1][0]
+       speed.loc['speed_factor']['X7']=params[1][1]
+       speed.loc['speed_factor']['X8']=params[1][2]
+       speed.loc['speed_factor']['X9']=params[1][3]
+#       print (speed)
+#       print(comb)
+       comb.set_value(comb.index[3],comb.columns[3],params[3][0]*10)
+       comb.set_value(comb.index[3],comb.columns[7],params[3][0]*10)
+       comb.set_value(comb.index[9],comb.columns[2],params[3][1]*10)
+       comb.set_value(comb.index[9],comb.columns[6],params[3][1]*10)
+       comb.set_value(comb.index[10],comb.columns[2],params[3][2])
+       comb.set_value(comb.index[10],comb.columns[6],params[3][2])
+#       print (comb)
+#       print (adcon)
+       adcon.set_value(adcon.index[2],adcon.columns[0],params[3][0])
+       adcon.set_value(adcon.index[2],adcon.columns[2],params[3][1])
+       adcon.set_value(adcon.index[7],adcon.columns[1],params[3][2])
+       adcon.set_value(adcon.index[7],adcon.columns[3],params[3][3])
+       adcon.set_value(adcon.index[8],adcon.columns[1],params[3][4])
+       adcon.set_value(adcon.index[8],adcon.columns[3],params[3][5])
+#       print (adcon)
        
    def randomize_params(self):
       param_dict = dict()
@@ -104,7 +148,7 @@ class syncNet(object):
                if weights.get_value(index,column) == weights.get_value(index,column) and weights.get_value(index,column) !=0 :
                    weights.set_value(index,column,params[counter])
                    counter +=1
-       print(weights)
+#       print(weights)
            
    def input_speed_factors(self,params):
        counter = 0
@@ -115,17 +159,28 @@ class syncNet(object):
    def input_comb_par(self,params):
        counter = 0
        comb_par = self.comb_par_df
-       for i in comb_par.index[:10]:
+       params_auto = params
+#       for i in range(4):
+#           params_auto[i] = params_auto[i]*10
+       for i in comb_par.index:
            for j in comb_par.columns:
-               print(comb_par.get_value(i,j))
                if comb_par.get_value(i,j) != 1:
                    if comb_par.get_value(i,j) == comb_par.get_value(i,j):
-                       print (comb_par.get_value(i,j))
-                       comb_par.set_value(i,j,params[counter])
+                       comb_par.set_value(i,j,params_auto[counter])
                        counter +=1
-       print (comb_par)
+#       print (comb_par)
 
-#   def input_adcon_par(self,params): 
+   def input_adcon_par(self,params):
+       counter = 0
+       adcon = self.adcon_par_df
+#       print (adcon)
+       for i in adcon.index[2:]:
+           for j in adcon.columns:
+               if adcon.get_value(i,j) != 1:
+                   if adcon.get_value(i,j) == adcon.get_value(i,j):
+                       adcon.set_value(i,j,ceil(params[counter]*10)/10)
+                       counter +=1
+#       print (adcon)
        
                
                
@@ -136,7 +191,7 @@ class syncNet(object):
       '''method to shape the graph's main structure and 
       makes each edge and vertex ready for the 2 edges_/states_update functions'''
       dyad = nx.from_numpy_matrix(self.weights_df.values, create_using=nx.MultiDiGraph())
-      print(dyad.nodes)
+#      print(dyad.nodes)
       old_new = dict(zip(dyad.nodes(), self.sts_nms))
       nx.relabel_nodes(dyad, old_new, False)
 
@@ -194,7 +249,7 @@ class syncNet(object):
                set_edge_attr = "self.dyad[c[0]][c[1]][0].update({}=value)".format(r)
                exec(set_edge_attr)
          # a bit of feedback:      
-         print('Edge for nodes: {} saved to nx graph'.format(c))
+#         print('Edge for nodes: {} saved to nx graph'.format(c))
          
       ########### update VERTICES attributes ###############
       comb_par_df = self.comb_par_df
@@ -211,8 +266,8 @@ class syncNet(object):
                uptd_nds.append(c)
                
          nx.set_node_attributes(self.dyad, comb_d, r) # 'r' is the name of the attribute
-         if uptd_nds:
-            print("\"{}\" attribute updated for nodes: {} in nx graph".format(r, uptd_nds))
+#         if uptd_nds:
+#            print("\"{}\" attribute updated for nodes: {} in nx graph".format(r, uptd_nds))
       
       ########## plug speed factors in states ############
       speed_factors_df = self.speed_factors_df
@@ -220,7 +275,7 @@ class syncNet(object):
       for stt in speed_factors_df.columns:
          spf_d[stt] = speed_factors_df.loc['speed_factor'][stt]
       nx.set_node_attributes(self.dyad, spf_d, "speed_factor")
-      print('Speed factors for all nodes saved to nx graph')
+#      print('Speed factors for all nodes saved to nx graph')
       return
   
 
@@ -233,7 +288,7 @@ class syncNet(object):
          
 #      for t in range(1, time): # update only states
 #         dyad = states_update(dyad, t, delta)
-      print("Adaptive Timeline created for: " + str(self.name))
+#      print("Adaptive Timeline created for: " + str(self.name))
       self.dyad = dyad # networkx graph
       return
    
@@ -245,7 +300,7 @@ class syncNet(object):
          
       plt.legend(self.sts_nms)
       plt.show()
-      print("Plotted vertices:")
+#      print("Plotted vertices:")
       print(self.sts_nms)
       return
    
@@ -267,7 +322,7 @@ class syncNet(object):
             
       plt.legend(adcon_list)
       plt.show()
-      print("Plotted edges:" + str(adcon_list))
+#      print("Plotted edges:" + str(adcon_list))
       return
 
 
