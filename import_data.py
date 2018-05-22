@@ -12,11 +12,11 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from states_update import states_update
 from edges_update import edges_update
-
+import random
 
 class syncNet(object):
 
-   def __init__(self, name, file='data/socialtapping_V3-final.xlsx'):
+   def __init__(self, name, file='data/socialtapping_V4-final.xlsx'):
       self.name = name
       #read excel
       template = pd.read_excel(file, [0,1])
@@ -27,8 +27,7 @@ class syncNet(object):
    
 
    def import_model(self):
-      '''this function turns the sheet template into readable pandas dataframes'''
-         
+      '''this function turns the sheet template into readable pandas dataframes''' 
       # scrape weights into dataframe:
       weights_clean = np.asmatrix(self.sheet1.iloc[2:11, 0:9])
       weights_df = pd.DataFrame(weights_clean, index = self.sts_nms, 
@@ -37,21 +36,27 @@ class syncNet(object):
       weights_df.columns = self.sts_nms
       #fill NaNs with zeros
       weights_df = weights_df.fillna(0)
+#      weights_df.set_value('X1','X2',10)
+#      print (weights_df.get_value('X1','X2'))
 
 
       # scrape speed factors into dataframe:
       speed_factors_df = self.sheet1.iloc[13:14, 0:9]
+
       speed_factors_df.columns = self.sts_nms
       speed_factors_df.index = ['speed_factor']
-      ##
 
       # scrape combination function parameters into dataframe:
       comb_par_df = self.sheet1.iloc[15:28, 0:9]
       comb_par_df.columns = self.sts_nms
+#      comb_par_df.
+#      comb_par_df.loc['identity function','X1']=10
+#      print ('hier',comb_par_df)
       ##
       
       # scrape heb and hom parameters from sheet 2 into df
       adcon_par_df = self.sheet2.iloc[2:11, 1:101]
+#      print (adcon_par_df)
       
       # scrape parameter names...
       par_ar = np.asarray(self.sheet2.iloc[2:11, 0:1])
@@ -80,12 +85,59 @@ class syncNet(object):
       self.adcon_par_df = adcon_par_df
       self.init_states = [float(n) for n in[1, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
       return
-   
+  
+       
+   def randomize_params(self):
+      param_dict = dict()
+      count=0
+      for column in self.speed_factors_df.columns[1:]:
+          self.speed_factors_df.set_value('speed_factor',column,random.random())
+          param_dict [column] = self.speed_factors_df.values[0][count]
+          count +=1
+#      print(self.speed_factors_df)
+     
+   def input_weights(self, params):
+       counter = 0
+       weights = self.weights_df
+       for index in weights.index[1:]:
+           for column in weights.columns:
+               if weights.get_value(index,column) == weights.get_value(index,column) and weights.get_value(index,column) !=0 :
+                   weights.set_value(index,column,params[counter])
+                   counter +=1
+       print(weights)
+           
+   def input_speed_factors(self,params):
+       counter = 0
+       for column in self.speed_factors_df.columns[1:]:
+           self.speed_factors_df.set_value('speed_factor',column,params[counter])
+           counter+=1
+           
+   def input_comb_par(self,params):
+       counter = 0
+       comb_par = self.comb_par_df
+       for i in comb_par.index[:10]:
+           for j in comb_par.columns:
+               print(comb_par.get_value(i,j))
+               if comb_par.get_value(i,j) != 1:
+                   if comb_par.get_value(i,j) == comb_par.get_value(i,j):
+                       print (comb_par.get_value(i,j))
+                       comb_par.set_value(i,j,params[counter])
+                       counter +=1
+       print (comb_par)
+
+#   def input_adcon_par(self,params): 
+       
+               
+               
+       
+         
+       
    def build_dyad(self):
       '''method to shape the graph's main structure and 
       makes each edge and vertex ready for the 2 edges_/states_update functions'''
       dyad = nx.from_numpy_matrix(self.weights_df.values, create_using=nx.MultiDiGraph())
-      old_new = dict(zip(dyad.nodes, self.sts_nms))
+      print(dyad.nodes)
+      old_new = dict(zip(dyad.nodes(), self.sts_nms))
       nx.relabel_nodes(dyad, old_new, False)
 
       #timeline creation
@@ -170,6 +222,7 @@ class syncNet(object):
       nx.set_node_attributes(self.dyad, spf_d, "speed_factor")
       print('Speed factors for all nodes saved to nx graph')
       return
+  
 
    def record_interaction(self, time=100, delta=0.2):
       dyad = self.dyad
@@ -219,16 +272,17 @@ class syncNet(object):
 
 
 if __name__ == '__main__':
-   sync_dyad = syncNet()
+   sync_dyad = syncNet('dyad')
    sync_dyad.import_model()
    sync_dyad.build_dyad()
    sync_dyad.plug_parameters()
    sync_dyad.record_interaction(time=30, delta=0.2)
-   sync_dyad.plot_timeline()
+   sync_dyad.plot_activation()
+   sync_dyad.plot_weights()
 
 
-'''testing functions'''
-#### NODES COLLECTION
+#'''testing functions'''
+##### NODES COLLECTION
 #sync_dyad.dyad.nodes()
 ##
 ### EDGES COLLECTION
@@ -278,4 +332,4 @@ if __name__ == '__main__':
 #g.node[vrtx]['activityTimeLine'].update({t: actual_state})
 #g.node['X7']['activityTimeLine'][30] = 0.5
 #g.get_edge_data(source_node,target_node)[0]['weight'] = np.asscalar(new_weight) 
-###################################
+####################################
