@@ -1,0 +1,14 @@
+,,X1,X2,X3,X4,X5,X6,X7,X8,X9
+identity function,id(.),1,1,,,1,1,,,1
+sum function,sum(…),,,,,,,,,
+scaled sum,ssuml(…),,,,1,,,,1,
+,scaling factor l,,,,2,,,,2,
+normalised sum,norsuml(…),,,,,,,,,
+,normalizing factor l,,,,,,,,,
+adaptive normalised sum,adnorsuml(…),,,,,,,,,
+simple logistic,"slogistics,t(…)",,,,,,,,,
+advanced logistic,"alogistics,t(…)",,,1,,,,1,,
+,steepness s,,,8,,,,8,,
+,threshold t,,,0.5,,,,0.5,,
+adaptive advanced logistic,"adalogistics,t(…)",,,,,,,,,
+,steepness s,,,,,,,,,

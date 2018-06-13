@@ -17,18 +17,24 @@ from math import ceil
 
 class syncNet(object):
 
-   def __init__(self, name, file='data/socialtapping_V4-final.xlsx'):
+   def __init__(self, name,soc=1):
+      if soc == 1:
+          self.file ="data/socialtapping_V5-final.xlsx"
+      else:
+          self.file ="data/nonsocialtapping_V5-final.xlsx"
       self.name = name
-      #read excel
-      template = pd.read_excel(file, [0,1])
+      self.soc = soc
+
+   def import_model(self):
+      template = pd.read_excel(self.file, [0,1])
       self.sheet1 = template[0]
       self.sheet2 = template[1]
       #states'_names
       self.sts_nms = np.asarray(self.sheet1.iloc[0:1, 0:9])[0]
-   
-
-   def import_model(self):
-      '''this function turns the sheet template into readable pandas dataframes''' 
+#      print (self.sts_nms)
+#      print (np.array(['X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8', 'X9']))
+#      print (self.sheet1.iloc[0:1, 0:9])
+#      '''this function turns the sheet template into readable pandas dataframes''' 
       # scrape weights into dataframe:
       weights_clean = np.asmatrix(self.sheet1.iloc[2:11, 0:9])
       weights_df = pd.DataFrame(weights_clean, index = self.sts_nms, 
@@ -81,13 +87,29 @@ class syncNet(object):
       
       #assign df to syncNet
       self.weights_df = weights_df
+      weights_df.to_pickle('weights_df.pickle%s'%self.soc)
       self.speed_factors_df = speed_factors_df
+      speed_factors_df.to_pickle('speed_factors_df.pickle%s'%self.soc)
       self.comb_par_df = comb_par_df
+      comb_par_df.to_pickle('comb_par_df.pickle%s'%self.soc)
       self.adcon_par_df = adcon_par_df
+      adcon_par_df.to_pickle('adcon_par_df.pickle%s'%self.soc)
       self.init_states = [float(n) for n in[1, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
       return
   
-   def hardcoded_params(self, params):
+   def hardcoded_params(self, params,init_val):
+#       self.sts_nms = np.array(['X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8', 'X9'])
+#       self.weights_df = pd.read_pickle('weights_df.pickle%s'%self.soc)
+#       self.speed_factors_df = pd.read_pickle('speed_factors_df.pickle%s'%self.soc)
+#       self.comb_par_df = pd.read_pickle('comb_par_df.pickle%s'%self.soc)
+#       self.adcon_par_df = pd.read_pickle('adcon_par_df.pickle%s'%self.soc)
+#       self.init_states = [float(n) for n in[1, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+       self.sts_nms = init_val[0]
+       self.weights_df = init_val[1]
+       self.speed_factors_df = init_val[2]
+       self.comb_par_df = init_val[3]
+       self.adcon_par_df = init_val[4]
+       self.init_states = init_val[5]
        weights = self.weights_df
        speed = self.speed_factors_df
        comb = self.comb_par_df
@@ -115,18 +137,18 @@ class syncNet(object):
        speed.loc['speed_factor']['X9']=params[1][3]
 #       print (speed)
 #       print(comb)
-       comb.set_value(comb.index[3],comb.columns[3],params[3][0]*10)
-       comb.set_value(comb.index[3],comb.columns[7],params[3][0]*10)
-       comb.set_value(comb.index[9],comb.columns[2],params[3][1]*10)
-       comb.set_value(comb.index[9],comb.columns[6],params[3][1]*10)
+       comb.set_value(comb.index[3],comb.columns[3],params[3][0]*3)
+       comb.set_value(comb.index[3],comb.columns[7],params[3][0]*3)
+       comb.set_value(comb.index[9],comb.columns[2],params[3][1]*50)
+       comb.set_value(comb.index[9],comb.columns[6],params[3][1]*50)
        comb.set_value(comb.index[10],comb.columns[2],params[3][2])
        comb.set_value(comb.index[10],comb.columns[6],params[3][2])
 #       print (comb)
 #       print (adcon)
        adcon.set_value(adcon.index[2],adcon.columns[0],params[3][0])
        adcon.set_value(adcon.index[2],adcon.columns[2],params[3][1])
-       adcon.set_value(adcon.index[7],adcon.columns[1],params[3][2])
-       adcon.set_value(adcon.index[7],adcon.columns[3],params[3][3])
+       adcon.set_value(adcon.index[7],adcon.columns[1],(params[3][2]*0.95)+0.05)
+       adcon.set_value(adcon.index[7],adcon.columns[3],(params[3][3]*0.95)+0.05)
        adcon.set_value(adcon.index[8],adcon.columns[1],params[3][4])
        adcon.set_value(adcon.index[8],adcon.columns[3],params[3][5])
 #       print (adcon)
@@ -181,11 +203,6 @@ class syncNet(object):
                        adcon.set_value(i,j,ceil(params[counter]*10)/10)
                        counter +=1
 #       print (adcon)
-       
-               
-               
-       
-         
        
    def build_dyad(self):
       '''method to shape the graph's main structure and 
@@ -327,13 +344,42 @@ class syncNet(object):
 
 
 if __name__ == '__main__':
-   sync_dyad = syncNet('dyad')
-   sync_dyad.import_model()
-   sync_dyad.build_dyad()
-   sync_dyad.plug_parameters()
-   sync_dyad.record_interaction(time=30, delta=0.2)
-   sync_dyad.plot_activation()
-   sync_dyad.plot_weights()
+    init_val0 = [
+        np.array(['X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8', 'X9']),
+        pd.read_pickle('weights_df.pickle0'),
+        pd.read_pickle('speed_factors_df.pickle0'),
+        pd.read_pickle('comb_par_df.pickle0'),
+        pd.read_pickle('adcon_par_df.pickle0'),
+        [float(n) for n in[1, 0, 0, 0, 0, 0, 0, 0, 0, 0]]]
+    init_val1 = [
+        np.array(['X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8', 'X9']),
+        pd.read_pickle('weights_df.pickle1'),
+        pd.read_pickle('speed_factors_df.pickle1'),
+        pd.read_pickle('comb_par_df.pickle1'),
+        pd.read_pickle('adcon_par_df.pickle1'),
+        [float(n) for n in[1, 0, 0, 0, 0, 0, 0, 0, 0, 0]]]
+    
+    sync_dyad = syncNet('dyad',1)
+#   sync_dyad.import_model()
+    params = """
+0.15054815 0.60857952 0.35455471 0.44802747 0.71672866 0.60095108
+ 0.41614356 0.37844758 0.3662348  0.8094674  0.57873722 0.34684227
+ 0.63714375 0.4103085  0.1206543  0.61342525 0.35691986 0.76903082
+ 0.91456311 0.6017998
+    """
+    params = [float(n) for n in params.split()]
+    wp = params[:7]
+    sp = params[7:11]
+    cp = params[11:14]
+    ap = params[14:]
+    formatted_params =[wp,sp,cp,ap]
+    print (formatted_params)
+    sync_dyad.hardcoded_params(formatted_params,init_val1)
+    sync_dyad.build_dyad()
+    sync_dyad.plug_parameters()
+    sync_dyad.record_interaction(time=250, delta=0.2)
+    sync_dyad.plot_activation()
+    sync_dyad.plot_weights()
 
 
 #'''testing functions'''

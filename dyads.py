@@ -85,8 +85,11 @@ def ssr(soc_dyad, nonsoc_dyad):
        for act in range(len(social_actTL)):
           vrtx_SSR += (social_actTL[act] - nonsocial_actTL[act])**2         
        SSR_dict[vrtx] = vrtx_SSR
+       if vrtx == 'X7':
+           X7s = social_actTL[-1]
+           X7ns = nonsocial_actTL[-1]
     print (SSR_dict)
-    return(SSR_dict)
+    return(SSR_dict, X7s, X7ns)
 
 def input_params(net, params):
     net.input_weights(params[0])
@@ -94,24 +97,23 @@ def input_params(net, params):
     net.input_comb_par(params[2])
     net.input_adcon_par(params[3])
 
-def init_nets():
-    soc_syncNet = syncNet(name="soc_syncNet", file="data/socialtapping_V5-final.xlsx")
-    soc_syncNet.import_model()
+def init_nets(params):
+    soc_syncNet = syncNet(name="soc_syncNet", soc=1)
+#    soc_syncNet.import_model()
+    soc_syncNet.hardcoded_params(params)
     soc_syncNet.build_dyad()
-    nonsoc_syncNet = syncNet(name="nonsoc_syncNet", file="data/nonsocialtapping_V5-final.xlsx")  
-    nonsoc_syncNet.import_model()
+    nonsoc_syncNet = syncNet(name="nonsoc_syncNet", soc=0)  
+#    nonsoc_syncNet.import_model()
+    nonsoc_syncNet.hardcoded_params(params)
     nonsoc_syncNet.build_dyad()
     return(soc_syncNet,nonsoc_syncNet)
     
-def update_net(net, params):
-    net.hardcoded_params(params)
-#    net.input_weights(params[0])
-#    net.input_speed_factors(params[1])
-#    net.input_comb_par(params[2])
-#    net.input_adcon_par(params[3])
-#    net.build_dyad()
+def test_net(soc, init_val, params):
+    net = syncNet(name='a', soc=soc)
+    net.hardcoded_params(params,init_val)
+    net.build_dyad()
     net.plug_parameters()
-    net.record_interaction(time=600)
+    net.record_interaction(time=250)
     return net
 
 def compare_nets(net1,net2):
