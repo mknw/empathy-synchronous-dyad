@@ -1,0 +1,10 @@
+#cache 
+__cache__/
+__pychache__/
+activate-net
+sync_dyad.py
+Debug/
+data/
+
+*.pyc
+*.png
