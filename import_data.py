@@ -34,10 +34,10 @@ class syncNet(object):
 #      print (self.sts_nms)
 #      print (np.array(['X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8', 'X9']))
 #      print (self.sheet1.iloc[0:1, 0:9])
-#      '''this function turns the sheet template into readable pandas dataframes''' 
+#      '''this function turns the sheet template into readable pandas dataframes'''
       # scrape weights into dataframe:
       weights_clean = np.asmatrix(self.sheet1.iloc[2:11, 0:9])
-      weights_df = pd.DataFrame(weights_clean, index = self.sts_nms, 
+      weights_df = pd.DataFrame(weights_clean, index = self.sts_nms,
                                 dtype="Float64")
       # label weights indices:
       weights_df.columns = self.sts_nms
@@ -60,31 +60,31 @@ class syncNet(object):
 #      comb_par_df.loc['identity function','X1']=10
 #      print ('hier',comb_par_df)
       ##
-      
+
       # scrape heb and hom parameters from sheet 2 into df
       adcon_par_df = self.sheet2.iloc[2:11, 1:101]
 #      print (adcon_par_df)
-      
+
       # scrape parameter names...
       par_ar = np.asarray(self.sheet2.iloc[2:11, 0:1])
       #...and assign them to parameter indices
       par_nms = []
-      for pn in par_ar: #remove unwanted tuples caused by comas 
+      for pn in par_ar: #remove unwanted tuples caused by comas
          par_nms.append(''.join(pn[0]))
       adcon_par_df.index = par_nms
-      
+
       # create state tuples, e.g. ('X1', 'x1') ... ('X10', 'x10')
       tot_sts_nms = np.append(self.sts_nms, 'X10')
       orig_sts = [stt for stt in tot_sts_nms for y in range(10)]
       dest_sts = [stt for stt in tot_sts_nms] * 10
-      sts_tpls = zip(orig_sts, dest_sts) 
+      sts_tpls = zip(orig_sts, dest_sts)
       # finally, assign cols to hebbian and homophily parameters
       adcon_par_df.columns = sts_tpls
-      
+
       # and drop unused columns
       adcon_par_df = adcon_par_df.dropna(1, 'all')
       ##
-      
+
       #assign df to syncNet
       self.weights_df = weights_df
       weights_df.to_pickle('weights_df.pickle%s'%self.soc)
@@ -96,7 +96,7 @@ class syncNet(object):
       adcon_par_df.to_pickle('adcon_par_df.pickle%s'%self.soc)
       self.init_states = [float(n) for n in[1, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
       return
-  
+
    def hardcoded_params(self, params,init_val):
 #       self.sts_nms = np.array(['X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8', 'X9'])
 #       self.weights_df = pd.read_pickle('weights_df.pickle%s'%self.soc)
@@ -152,7 +152,7 @@ class syncNet(object):
        adcon.set_value(adcon.index[8],adcon.columns[1],params[3][4])
        adcon.set_value(adcon.index[8],adcon.columns[3],params[3][5])
 #       print (adcon)
-       
+
    def randomize_params(self):
       param_dict = dict()
       count=0
@@ -161,7 +161,7 @@ class syncNet(object):
           param_dict [column] = self.speed_factors_df.values[0][count]
           count +=1
 #      print(self.speed_factors_df)
-     
+
    def input_weights(self, params):
        counter = 0
        weights = self.weights_df
@@ -171,13 +171,13 @@ class syncNet(object):
                    weights.set_value(index,column,params[counter])
                    counter +=1
 #       print(weights)
-           
+
    def input_speed_factors(self,params):
        counter = 0
        for column in self.speed_factors_df.columns[1:]:
            self.speed_factors_df.set_value('speed_factor',column,params[counter])
            counter+=1
-           
+
    def input_comb_par(self,params):
        counter = 0
        comb_par = self.comb_par_df
@@ -203,9 +203,9 @@ class syncNet(object):
                        adcon.set_value(i,j,ceil(params[counter]*10)/10)
                        counter +=1
 #       print (adcon)
-       
+
    def build_dyad(self):
-      '''method to shape the graph's main structure and 
+      '''method to shape the graph's main structure and
       makes each edge and vertex ready for the 2 edges_/states_update functions'''
       dyad = nx.from_numpy_matrix(self.weights_df.values, create_using=nx.MultiDiGraph())
 #      print(dyad.nodes)
@@ -215,33 +215,33 @@ class syncNet(object):
       #timeline creation
       stt_d = {} #create dictionary for the 'state' attribute to be used by update functions
       stt_tmln_d = {} #create timelines dictionary for state activities
-      
+
       for i in range(len(self.sts_nms)):
          #match states' names with initial weights
-         stt_d[self.sts_nms[i]] = self.init_states[i] 
+         stt_d[self.sts_nms[i]] = self.init_states[i]
          # match time 0 with initial weight; assign it to states' names
          d = {0: self.init_states[i]} # time = 0 for all dicts
-         stt_tmln_d[self.sts_nms[i]] = d 
-         
-         
+         stt_tmln_d[self.sts_nms[i]] = d
+
+
       # push into graph
       nx.set_node_attributes(dyad, stt_tmln_d, 'activityTimeLine')
       nx.set_node_attributes(dyad, stt_d, 'state')
-      
+
 #      for x in range(len(sts_mns)):
 #         for y in range(len(sts_mns)):
 #            weight = (sync_dyad.weights_df[sts_mns[y]][sts_mns[x]])
-      
-      
+
+
       for orig, dest in dyad.edges():
          weight = dyad.get_edge_data(orig, dest)[0]['weight']
          dyad[orig][dest][0].update(weightTimeLine={0:weight})
-            
+
       self.dyad = dyad
       return
-   
+
    def plug_parameters(self):
-      '''iterate over pandas dataframes and plug respective values into 
+      '''iterate over pandas dataframes and plug respective values into
       networkx graph. Added attributes are to be used by the eu & su functions'''
       #list of edge_update parameters:
       eu_par = ['speed_factor', 'hebbian', 'persistence', 'slhom', 'alhom',
@@ -252,26 +252,26 @@ class syncNet(object):
 
 
       ######### update EDGES attributes ##############
-      adcon_par_df = self.adcon_par_df 
+      adcon_par_df = self.adcon_par_df
       adcon_par_df.index = eu_par # change levels to the ones used as function arguments
 
       for c in adcon_par_df.columns:
          for r in adcon_par_df.index:
             if adcon_par_df.loc[r][c] == adcon_par_df.loc[r][c]: # =if not NaN
-               
+
                value = adcon_par_df.loc[r][c]
 #               print("nodes: {}, Par:{}, Value:{}".format(c, r, value))
-               
+
                # find edge by indexing the dataframe column (tuple), update its value:
                set_edge_attr = "self.dyad[c[0]][c[1]][0].update({}=value)".format(r)
                exec(set_edge_attr)
-         # a bit of feedback:      
+         # a bit of feedback:
 #         print('Edge for nodes: {} saved to nx graph'.format(c))
-         
+
       ########### update VERTICES attributes ###############
       comb_par_df = self.comb_par_df
       comb_par_df.index = su_par # change levels to the ones used as function arguments
-      
+
       for r in comb_par_df.index:
          comb_d = {}
          uptd_nds = []
@@ -279,13 +279,13 @@ class syncNet(object):
             if comb_par_df.loc[r][c] == comb_par_df.loc[r][c]: # =if not NaN
                value = comb_par_df.loc[r][c] # save assign param to 'value'
                # assign the par value to 'r' key, which is the state's_name in the dict
-               comb_d[c] = value 
+               comb_d[c] = value
                uptd_nds.append(c)
-               
+
          nx.set_node_attributes(self.dyad, comb_d, r) # 'r' is the name of the attribute
 #         if uptd_nds:
 #            print("\"{}\" attribute updated for nodes: {} in nx graph".format(r, uptd_nds))
-      
+
       ########## plug speed factors in states ############
       speed_factors_df = self.speed_factors_df
       spf_d = {}
@@ -294,38 +294,38 @@ class syncNet(object):
       nx.set_node_attributes(self.dyad, spf_d, "speed_factor")
 #      print('Speed factors for all nodes saved to nx graph')
       return
-  
+
 
    def record_interaction(self, time=100, delta=0.2):
       dyad = self.dyad
-      
+
       for t in range(1, time): # OC original code
          temp_dyad = edges_update(dyad, t, delta)
          dyad = states_update(temp_dyad, t, delta)
-         
+
 #      for t in range(1, time): # update only states
 #         dyad = states_update(dyad, t, delta)
 #      print("Adaptive Timeline created for: " + str(self.name))
       self.dyad = dyad # networkx graph
       return
-   
+
    def plot_activation(self):
       plt.figure(figsize=(20,10))
       for node in self.dyad.nodes():
          state_tuples = self.dyad.node[node]['activityTimeLine'].items()
          plt.plot(*zip(*state_tuples))
-         
+
       plt.legend(self.sts_nms)
       plt.show()
 #      print("Plotted vertices:")
       print(self.sts_nms)
       return
-   
-   
+
+
    def plot_weights(self):
       plt.figure(figsize=(20, 10))
       adcon_list = []
-      
+
       for edge in self.dyad.edges():
          source, target = edge
          #Select only adaptive edges based on number of attr assigned:
@@ -336,7 +336,7 @@ class syncNet(object):
             #unpack them:
             plt.plot(*zip(*state_tuples))
             adcon_list.append(edge)
-            
+
       plt.legend(adcon_list)
       plt.show()
 #      print("Plotted edges:" + str(adcon_list))
@@ -358,14 +358,14 @@ if __name__ == '__main__':
         pd.read_pickle('comb_par_df.pickle1'),
         pd.read_pickle('adcon_par_df.pickle1'),
         [float(n) for n in[1, 0, 0, 0, 0, 0, 0, 0, 0, 0]]]
-    
-    sync_dyad = syncNet('dyad',1)
+
+    sync_dyad = syncNet('dyad',1) # CHANGE THIS TO PLOT THE RIGHT ONE
 #   sync_dyad.import_model()
     params = """
-0.15054815 0.60857952 0.35455471 0.44802747 0.71672866 0.60095108
- 0.41614356 0.37844758 0.3662348  0.8094674  0.57873722 0.34684227
- 0.63714375 0.4103085  0.1206543  0.61342525 0.35691986 0.76903082
- 0.91456311 0.6017998
+0.68788575 0.6865711  0.68526224 0.89482529 0.41349002 0.74633312
+ 0.5451137  0.61392898 0.4873071  0.41095488 0.59917841 0.604209
+ 0.60589506 0.30805096 0.58075179 0.9974116  0.57439151 0.40865873
+ 0.65423406 0.76513307
     """
     params = [float(n) for n in params.split()]
     wp = params[:7]
@@ -374,7 +374,7 @@ if __name__ == '__main__':
     ap = params[14:]
     formatted_params =[wp,sp,cp,ap]
     print (formatted_params)
-    sync_dyad.hardcoded_params(formatted_params,init_val1)
+    sync_dyad.hardcoded_params(formatted_params,init_val1) # CHANGE THIS TO PLOT THE RIGHT ONE
     sync_dyad.build_dyad()
     sync_dyad.plug_parameters()
     sync_dyad.record_interaction(time=250, delta=0.2)
@@ -389,7 +389,7 @@ if __name__ == '__main__':
 ### EDGES COLLECTION
 #sync_dyad.dyad.edges()
 #
-## FOR EACH NODE print NAME + NX NODE attribute 
+## FOR EACH NODE print NAME + NX NODE attribute
 #for vrtx in sync_dyad.dyad.nodes():
 #   print(vrtx)
 #   print(sync_dyad.dyad.node[vrtx])
@@ -403,7 +403,7 @@ if __name__ == '__main__':
 #      print(sync_dyad.dyad[vrtx][succ])
 #
 #
-### get specific NODE 
+### get specific NODE
 #sync_dyad.dyad.node['X8']
 #
 ### get specific EDGE
@@ -418,19 +418,19 @@ if __name__ == '__main__':
 #for e in g.edges():
 #   orig, dest = e
 #   print("from " + orig + " to " + dest)
-#   
+#
 #   if 'hebbian' in g[orig][dest][0]:
 #      print("hebbian")
 #   elif 'slhom' in g[orig][dest][0]:
 #      print("slhom")
 #   else:
 #      print("no change in weight")
-#      
+#
 ### UPDATE function, works only when assigning sync_dyad.dyad to a var (g)
 #vrtx = 'X7'
 #t = 30
 #actual_state = 1
 #g.node[vrtx]['activityTimeLine'].update({t: actual_state})
 #g.node['X7']['activityTimeLine'][30] = 0.5
-#g.get_edge_data(source_node,target_node)[0]['weight'] = np.asscalar(new_weight) 
+#g.get_edge_data(source_node,target_node)[0]['weight'] = np.asscalar(new_weight)
 ####################################

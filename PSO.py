@@ -22,16 +22,16 @@ def calcfitness(params):
     outputs, X7s, X7ns = dyads.compare_nets(net1,net2)
     x7= outputs['X7']+0.00000000000000000000000000000000000001
     del outputs['X7']
-    A = sum(outputs.values())
-    B = abs((0.8/X7s)-1)
-    B2 = 10*(X7s**2)-16*X7s+6.4000001
-    B3 = abs(2*X7s-1.6)
+    A = sum(outputs.values()) # keeps all values the same (xcept for X7)
+    B = abs((0.8/X7s)-1) # divide by chosen value # reach 0.8 @ social condition
+    B2 = 10*(X7s**2)-16*X7s+6.4000001 # bell curve
+    B3 = abs(2*X7s-1.6) #
     C = abs((0.45/X7ns)-1)
-    C2 = 10*(X7ns**2)-9*X7ns+2.0250001
+    C2 = 10*(X7ns**2)-9*X7ns+2.0250001 # reach 0.45 for nonsocial
     C3 = abs(2*X7ns-0.9)
-    D = 1/x7
-    E = x7*-1
-    fitness = A+B3+C3+D
+    D = 1/x7 # maximize x7 diff
+    E = x7*-1 # take x7 low as crazy
+    fitness = D + C2 # change this for evaluation function
     print(params)
     print(fitness)
     return fitness
@@ -56,10 +56,10 @@ init_val1 = [
     [float(n) for n in[1, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
         ]
 
-lb = [0.001]*20
+lb = [0.001]*20 # lower bound:
 ub = [1]*20
 
 xopt, fopt = pso(calcfitness, lb, ub,swarmsize=100, omega=0.5, phip=0.5, phig=0.5, maxiter=100, minstep=1e-6,
-    minfunc=1e-05, debug=False)
+    minfunc=1e-05, debug=False) # minfunc: the higher the faster
 
 print (xopt,fopt)
