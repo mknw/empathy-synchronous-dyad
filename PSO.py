@@ -2,12 +2,6 @@ import dyads
 from pyswarm import pso
 import pandas as pd
 import numpy as np
-#weights, symmetric except for adaptive connction
-#Speed factorss symmetric[1:]
-#Sc factor(R)
-#steep(R)
-#thresh(0-1)
-#adcon mu tau alpha the rest is boolean not symmetric
 
 def calcfitness(params):
     global init_val0
@@ -20,7 +14,12 @@ def calcfitness(params):
     net1 = dyads.test_net(1,init_val1, formatted_params)
     net2 = dyads.test_net(0,init_val0, formatted_params)
     outputs, X7s, X7ns = dyads.compare_nets(net1,net2)
+    x3= outputs['X3']
+    x4= outputs['X4']
+    x5= outputs['X5']
+    x8= outputs['X8']
     x7= outputs['X7']+0.00000000000000000000000000000000000001
+    x9= outputs['X9']+0.00000000000000000000000000000000000001
     del outputs['X7']
     A = sum(outputs.values())
     B = abs((0.8/X7s)-1)
@@ -31,7 +30,21 @@ def calcfitness(params):
     C3 = abs(2*X7ns-0.9)
     D = 1/x7
     E = x7*-1
-    fitness = A+B3+C3+D
+    F = abs(x3-x4)+0.00000000000000000000000000000000000001
+    G = abs(x7-x8)+0.00000000000000000000000000000000000001
+    H = 1/F
+    I = 1/x9
+    J = x5
+    
+    #hebbian X3 X4, X7 X8 *should as close to 0 also as high as possible between 0.3 and 0.8
+    #excecution state similar
+    #X3s,X7s,X3ns same and minimize X3ns
+    #make function to calculate difference for each time step. (output in sse like values)
+    #flip between one and zero for between %10 
+    #make function that check on each time step if the difference 
+    #the weights between X3s X4s and X7s and X8s should be the same as X3ns X4ns and minimize weight of x7ns x8ns
+    #and the same with the states of X5 and X9
+    fitness = F+G+H+I+J
     print(params)
     print(fitness)
     return fitness

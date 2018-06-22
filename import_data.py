@@ -310,36 +310,59 @@ class syncNet(object):
       return
    
    def plot_activation(self):
-      plt.figure(figsize=(20,10))
+      plt.figure(figsize=(20,15))
+      plt.suptitle("Node and weight timelines for the " + self.name, fontsize = 25)
+      plt.subplot(2, 1, 1)
       for node in self.dyad.nodes():
          state_tuples = self.dyad.node[node]['activityTimeLine'].items()
          plt.plot(*zip(*state_tuples))
-         
-      plt.legend(self.sts_nms)
-      plt.show()
-#      print("Plotted vertices:")
+
+      plt.ylabel(r"Activation level $_{(normalised)}$", fontsize=15)
+      plt.xlabel("Time (seconds)", fontsize=15)
+      plt.title("Node activation", {'fontsize': 20})
+      legend = [r"$ws_s$",
+                r"$srs_{A, s}$", r"$srs_{A, esB}$", r"$ps_{A, a}$", r"$es_{A, a}$",
+                r"$srs_{B, s}$", r"$srs_{B, esA}$", r"$ps_{B, a}$", r"$es_{B, a}$"]
+      plt.legend(legend, loc=2, fontsize='x-large')
+      # plt.show()
+      print("Plotted vertices:")
       print(self.sts_nms)
       return
-   
-   
+
+   def get_states_dict(self):
+       real_names = [r"$ws_s$",
+                     r"$srs_{A, s}$", r"$srs_{A, esB}$", r"$ps_{A, a}$", r"$es_{A, a}$",
+                     r"$srs_{B, s}$", r"$srs_{B, esA}$", r"$ps_{B, a}$", r"$es_{B, a}$"]
+       real_names_dict = dict(zip(self.sts_nms, real_names))
+       return real_names_dict
+
    def plot_weights(self):
-      plt.figure(figsize=(20, 10))
-      adcon_list = []
-      
+      plt.subplot(2, 1, 2)
+      rl_adcon_list = []
+      names_dict = self.get_states_dict()
       for edge in self.dyad.edges():
          source, target = edge
          #Select only adaptive edges based on number of attr assigned:
-#         if len(self.dyad.get_edge_data(source, target)[0]) > 3:
-         if len(self.dyad[source][target][0]) > 3:
+         # if len(self.dyad.get_edge_data(source, target)[0]) > 3:
+         if len(self.dyad[source][target][0]) > 4:
             #get items:
             state_tuples = self.dyad.get_edge_data(source, target)[0]['weightTimeLine'].items()
             #unpack them:
             plt.plot(*zip(*state_tuples))
-            adcon_list.append(edge)
-            
-      plt.legend(adcon_list)
+
+            # create legend through node names dictionary
+            real_edge = str(names_dict[source] + ", " + names_dict[target])
+            rl_adcon_list.append(real_edge)
+
+
+      plt.ylabel(r"Weights $_{(normalised)}$", fontsize=15)
+      plt.xlabel("Time (seconds)", fontsize=15)
+      plt.title("Edges weights", {'fontsize': 20})
+      plt.legend(rl_adcon_list, loc=3, fontsize='x-large')
+      plt.tight_layout(pad=6)
+
       plt.show()
-#      print("Plotted edges:" + str(adcon_list))
+      print("Plotted edges:" + str(rl_adcon_list))
       return
 
 
@@ -362,10 +385,10 @@ if __name__ == '__main__':
     sync_dyad = syncNet('dyad',1)
 #   sync_dyad.import_model()
     params = """
-0.15054815 0.60857952 0.35455471 0.44802747 0.71672866 0.60095108
- 0.41614356 0.37844758 0.3662348  0.8094674  0.57873722 0.34684227
- 0.63714375 0.4103085  0.1206543  0.61342525 0.35691986 0.76903082
- 0.91456311 0.6017998
+ .99413867 0.56718675 0.52048217 0.53189253 0.54509952 0.45457958
+ 0.26417857 0.32331197 0.87925347 0.9358039  0.01725283 0.60752863
+ 0.00165427 0.63969025 0.39594173 0.13365154 0.59779882 0.04472819
+ 0.49882534 0.0058337 
     """
     params = [float(n) for n in params.split()]
     wp = params[:7]
