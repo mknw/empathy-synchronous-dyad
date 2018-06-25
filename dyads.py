@@ -76,20 +76,37 @@ from import_data import syncNet
 #print(SSR_dict)
 
 def ssr(soc_dyad, nonsoc_dyad):
+    x5ls = []
+    x3sx7s_SSR = 0
+    x3sx3ns_SSR = 0
+    x3nsx7s_SSR = 0
+    x3sx7ns_SSR = 0
+    x5x9_SSR = 0
     SSR_dict = {}
+    social_weiTL_x3x4 = list(soc_dyad.get_edge_data('X3', 'X4')[0]['weightTimeLine'].values())
+    nonsocial_weiTL_x3x4 = list(nonsoc_dyad.get_edge_data('X3', 'X4')[0]['weightTimeLine'].values())
+    social_weiTL_x7x8 = list(soc_dyad.get_edge_data('X7', 'X8')[0]['weightTimeLine'].values())
+    nonsocial_weiTL_x7x8 = list(nonsoc_dyad.get_edge_data('X7', 'X8')[0]['weightTimeLine'].values())
+    for wei in range(len(social_weiTL_x3x4)):
+        x3sx7s_SSR += (social_weiTL_x3x4[wei]-social_weiTL_x7x8[wei])**2
+        x3sx3ns_SSR +=(social_weiTL_x3x4[wei]-nonsocial_weiTL_x3x4[wei])**2
+        x3nsx7s_SSR +=(nonsocial_weiTL_x3x4[wei]-social_weiTL_x7x8[wei])**2
+        x3sx7ns_SSR +=(social_weiTL_x3x4[wei]-nonsocial_weiTL_x7x8[wei])**2
     for vrtx in soc_dyad.nodes():
        vrtx_SSR = 0 
-       social_actTL = list(soc_dyad.node[vrtx]['activityTimeLine'].values())   
+       social_actTL = list(soc_dyad.node[vrtx]['activityTimeLine'].values())
        nonsocial_actTL = list(nonsoc_dyad.node[vrtx]['activityTimeLine'].values())   
        act_tuples = zip(social_actTL, nonsocial_actTL)   
        for act in range(len(social_actTL)):
           vrtx_SSR += (social_actTL[act] - nonsocial_actTL[act])**2         
        SSR_dict[vrtx] = vrtx_SSR
-       if vrtx == 'X7':
-           X7s = social_actTL[-1]
-           X7ns = nonsocial_actTL[-1]
+       if vrtx == 'X5':
+           x5ls = social_actTL
+       if vrtx == 'X9':
+           for act in range(len(social_actTL)):
+               x5x9_SSR += (social_actTL[act] - x5ls[act])**2
     print (SSR_dict)
-    return(SSR_dict, X7s, X7ns)
+    return(SSR_dict,x3sx7s_SSR,x3sx3ns_SSR,x3nsx7s_SSR,x3sx7ns_SSR,x5x9_SSR)
 
 def input_params(net, params):
     net.input_weights(params[0])
@@ -113,7 +130,7 @@ def test_net(soc, init_val, params):
     net.hardcoded_params(params,init_val)
     net.build_dyad()
     net.plug_parameters()
-    net.record_interaction(time=250)
+    net.record_interaction(time=450)
     return net
 
 def compare_nets(net1,net2):

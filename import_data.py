@@ -116,15 +116,19 @@ class syncNet(object):
        adcon = self.adcon_par_df
 #       print (weights)
        weights.loc['X2']['X4']=params[0][0]
-       weights.loc['X3']['X4']=params[0][3]
+#       weights.loc['X3']['X4']=params[0][3]
+       weights.loc['X3']['X4']=0.6
        weights.loc['X4']['X3']=params[0][1]
        weights.loc['X4']['X5']=params[0][2]
-       weights.loc['X5']['X7']=params[0][4]
+#       weights.loc['X5']['X7']=params[0][4]
+       weights.loc['X5']['X7']=0.6
        weights.loc['X6']['X8']=params[0][0]
-       weights.loc['X7']['X8']=params[0][5]
+#       weights.loc['X7']['X8']=params[0][5]
+       weights.loc['X7']['X8']=0.6
        weights.loc['X8']['X7']=params[0][2]
        weights.loc['X8']['X9']=params[0][3]
-       weights.loc['X9']['X3']=params[0][6]
+#       weights.loc['X9']['X3']=params[0][6]
+       weights.loc['X9']['X3']=0.6
 #       print (weights)
 #       print (speed)
        speed.loc['speed_factor']['X2']=params[1][0]
@@ -385,12 +389,12 @@ if __name__ == '__main__':
     sync_dyad = syncNet('dyad',1)
 #   sync_dyad.import_model()
     params = """
- .99413867 0.56718675 0.52048217 0.53189253 0.54509952 0.45457958
- 0.26417857 0.32331197 0.87925347 0.9358039  0.01725283 0.60752863
- 0.00165427 0.63969025 0.39594173 0.13365154 0.59779882 0.04472819
- 0.49882534 0.0058337 
+0.13303336, 0.86377425, 0.6754289 , 0.76826546, 0.97525021,
+       0.90353149, 0.44698704, 0.60810768, 0.7843365 , 0.94436539,
+       0.85538739, 0.17942185, 0.51891043, 0.25636101, 0.10641095,
+       0.64041622, 0.65322647, 0.74598611, 0.67419562, 0.40651553
     """
-    params = [float(n) for n in params.split()]
+    params = [float(n) for n in params.split(',')]
     wp = params[:7]
     sp = params[7:11]
     cp = params[11:14]
@@ -400,7 +404,7 @@ if __name__ == '__main__':
     sync_dyad.hardcoded_params(formatted_params,init_val1)
     sync_dyad.build_dyad()
     sync_dyad.plug_parameters()
-    sync_dyad.record_interaction(time=250, delta=0.2)
+    sync_dyad.record_interaction(time=450, delta=0.2)
     sync_dyad.plot_activation()
     sync_dyad.plot_weights()
 
