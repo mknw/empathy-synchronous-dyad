@@ -371,40 +371,42 @@ class syncNet(object):
 
 
 if __name__ == '__main__':
+    world = 1
     init_val0 = [
         np.array(['X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8', 'X9']),
         pd.read_pickle('weights_df.pickle0'),
         pd.read_pickle('speed_factors_df.pickle0'),
         pd.read_pickle('comb_par_df.pickle0'),
         pd.read_pickle('adcon_par_df.pickle0'),
-        [float(n) for n in[1, 0, 0, 0, 0, 0, 0, 0, 0, 0]]]
+        [float(n) for n in[world, 0, 0, 0, 0, 0, 0, 0, 0, 0]]]
     init_val1 = [
         np.array(['X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8', 'X9']),
         pd.read_pickle('weights_df.pickle1'),
         pd.read_pickle('speed_factors_df.pickle1'),
         pd.read_pickle('comb_par_df.pickle1'),
         pd.read_pickle('adcon_par_df.pickle1'),
-        [float(n) for n in[1, 0, 0, 0, 0, 0, 0, 0, 0, 0]]]
+        [float(n) for n in[world, 0, 0, 0, 0, 0, 0, 0, 0, 0]]]
     
-    sync_dyad = syncNet('dyad',1)
+    sync_dyad = syncNet('dyad',0)
 #   sync_dyad.import_model()
     params = """
-0.13303336, 0.86377425, 0.6754289 , 0.76826546, 0.97525021,
-       0.90353149, 0.44698704, 0.60810768, 0.7843365 , 0.94436539,
-       0.85538739, 0.17942185, 0.51891043, 0.25636101, 0.10641095,
-       0.64041622, 0.65322647, 0.74598611, 0.67419562, 0.40651553
+0.50366673  0.99917126  0.55458944  0.47640142  0.60598329  0.43953842
+  0.65226661  0.36225184  0.92644479  0.68074869  0.17865614  0.02728419
+  0.47786352  0.33164439  0.35179572  0.68801054  0.59039915  0.44925563
+  0.50267272  0.34745686
     """
-    params = [float(n) for n in params.split(',')]
+    params = [float(n) for n in params.split()]
     wp = params[:7]
     sp = params[7:11]
     cp = params[11:14]
     ap = params[14:]
     formatted_params =[wp,sp,cp,ap]
     print (formatted_params)
-    sync_dyad.hardcoded_params(formatted_params,init_val1)
+#    sync_dyad.import_model()
+    sync_dyad.hardcoded_params(formatted_params,init_val0)
     sync_dyad.build_dyad()
     sync_dyad.plug_parameters()
-    sync_dyad.record_interaction(time=450, delta=0.2)
+    sync_dyad.record_interaction(time=5000, delta=0.2)
     sync_dyad.plot_activation()
     sync_dyad.plot_weights()
 
