@@ -11,6 +11,7 @@ Created on Tue Jan 16 15:06:42 2018
 #from states_update import states_update
 #from edges_update import edges_update
 from import_data import syncNet
+import numpy as np
 
 
 #"""Create and prepare nx graphs through syncNet methods from import_data.py"""
@@ -88,18 +89,16 @@ def ssr(soc_dyad, nonsoc_dyad):
     nonsocial_weiTL_x3x4 = list(nonsoc_dyad.get_edge_data('X3', 'X4')[0]['weightTimeLine'].values())
     social_weiTL_x7x8 = list(soc_dyad.get_edge_data('X7', 'X8')[0]['weightTimeLine'].values())
     nonsocial_weiTL_x7x8 = list(nonsoc_dyad.get_edge_data('X7', 'X8')[0]['weightTimeLine'].values())
-    for wei in range(len(social_weiTL_x3x4)):
-        x3sx7s_SSR += (social_weiTL_x3x4[wei]-social_weiTL_x7x8[wei])**2
-        x3sx3ns_SSR +=(social_weiTL_x3x4[wei]-nonsocial_weiTL_x3x4[wei])**2
-        x3nsx7s_SSR +=(nonsocial_weiTL_x3x4[wei]-social_weiTL_x7x8[wei])**2
-        x3sx7ns_SSR +=(social_weiTL_x3x4[wei]-nonsocial_weiTL_x7x8[wei])**2
+
+    x3sx7s_SSR = np.sum((np.array(social_weiTL_x3x4)[:] - np.array(social_weiTL_x7x8)[:]) ** 2)
+    x3sx3ns_SSR = np.sum( (np.array(social_weiTL_x3x4)[:] - np.array(nonsocial_weiTL_x3x4)[:]) ** 2)
+    x3nsx7s_SSR = np.sum( (np.array(nonsocial_weiTL_x3x4)[:] - np.array(social_weiTL_x7x8)[:]) ** 2)
+    x3sx7ns_SSR = np.sum( (np.array(social_weiTL_x3x4)[:] - np.array(nonsocial_weiTL_x7x8)[:]) ** 2)
     for vrtx in soc_dyad.nodes():
-       vrtx_SSR = 0
-       social_actTL = list(soc_dyad.node[vrtx]['activityTimeLine'].values())
-       nonsocial_actTL = list(nonsoc_dyad.node[vrtx]['activityTimeLine'].values())
-       act_tuples = zip(social_actTL, nonsocial_actTL)
-       for act in range(len(social_actTL)):
-          vrtx_SSR += (social_actTL[act] - nonsocial_actTL[act])**2
+       social_actTL = np.array(list(soc_dyad.node[vrtx]['activityTimeLine'].values()))
+       nonsocial_actTL = np.array(list(nonsoc_dyad.node[vrtx]['activityTimeLine'].values()))
+
+       vrtx_SSR = np.sum( (social_actTL - nonsocial_actTL) ** 2)
        SSR_dict[vrtx] = vrtx_SSR
        if vrtx == 'X5':
            x5ls = social_actTL

@@ -34,7 +34,7 @@ def calcfitness(params):
 #    H = 1/F
 #    I = 1/x9
 #    J = x5
-    K = (x3sx7s_SSR+x3sx3ns_SSR+x3nsx7s_SSR)/3
+    K = (x3sx7s_SSR + x3sx3ns_SSR + x3nsx7s_SSR)/3
     L = 10/x3sx7ns_SSR
     M = x5
     N = x5x9_SSR

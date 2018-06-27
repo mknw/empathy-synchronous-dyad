@@ -385,7 +385,7 @@ if __name__ == '__main__':
         pd.read_pickle('speed_factors_df.pickle1'),
         pd.read_pickle('comb_par_df.pickle1'),
         pd.read_pickle('adcon_par_df.pickle1'),
-<<<<<<< HEAD
+
         [float(n) for n in[1, 0, 0, 0, 0, 0, 0, 0, 0, 0]]]
 
     sync_dyad = syncNet('dyad',0) # CHANGE THIS TO PLOT THE RIGHT ONE
@@ -395,18 +395,8 @@ if __name__ == '__main__':
        0.50358239, 0.56301566, 0.65429594, 0.31189895, 0.35299369,
        0.67449933, 0.18197258, 0.8568336 , 0.28998194, 0.17157816,
        0.8037501 , 1.        , 0.74572098, 0.42070014, 0.47171025
-=======
-        [float(n) for n in[world, 0, 0, 0, 0, 0, 0, 0, 0, 0]]]
-    
-    sync_dyad = syncNet('dyad',0)
-#   sync_dyad.import_model()
-    params = """
-0.50366673  0.99917126  0.55458944  0.47640142  0.60598329  0.43953842
-  0.65226661  0.36225184  0.92644479  0.68074869  0.17865614  0.02728419
-  0.47786352  0.33164439  0.35179572  0.68801054  0.59039915  0.44925563
-  0.50267272  0.34745686
->>>>>>> aa37b1bd8295795f8ec5ca52372a62ad5e23c566
-    """
+"""
+
     params = [float(n) for n in params.split()]
     wp = params[:7]
     sp = params[7:11]
@@ -414,18 +404,12 @@ if __name__ == '__main__':
     ap = params[14:]
     formatted_params =[wp,sp,cp,ap]
     print (formatted_params)
-<<<<<<< HEAD
-    sync_dyad.hardcoded_params(formatted_params,init_val0) # CHANGE THIS TO PLOT THE RIGHT ONE
-    sync_dyad.build_dyad()
-    sync_dyad.plug_parameters()
-    sync_dyad.record_interaction(time=1000, delta=0.2)
-=======
+
 #    sync_dyad.import_model()
     sync_dyad.hardcoded_params(formatted_params,init_val0)
     sync_dyad.build_dyad()
     sync_dyad.plug_parameters()
     sync_dyad.record_interaction(time=5000, delta=0.2)
->>>>>>> aa37b1bd8295795f8ec5ca52372a62ad5e23c566
     sync_dyad.plot_activation()
     sync_dyad.plot_weights()
 

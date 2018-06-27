@@ -10,10 +10,3 @@ for i in range(5):
         out2.write('\n\n')
         out2.write(str(result[1]))
         out2.write(str(time.time()-start))
-        
-        
-
-        
-
-    
-    
