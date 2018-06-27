@@ -82,6 +82,7 @@ def ssr(soc_dyad, nonsoc_dyad):
     x3nsx7s_SSR = 0
     x3sx7ns_SSR = 0
     x5x9_SSR = 0
+    end_val ={}
     SSR_dict = {}
     social_weiTL_x3x4 = list(soc_dyad.get_edge_data('X3', 'X4')[0]['weightTimeLine'].values())
     nonsocial_weiTL_x3x4 = list(nonsoc_dyad.get_edge_data('X3', 'X4')[0]['weightTimeLine'].values())
@@ -105,8 +106,9 @@ def ssr(soc_dyad, nonsoc_dyad):
        if vrtx == 'X9':
            for act in range(len(social_actTL)):
                x5x9_SSR += (social_actTL[act] - x5ls[act])**2
+       end_val[vrtx] = (social_actTL[-1],nonsocial_actTL[-1])
     print (SSR_dict)
-    return(SSR_dict,x3sx7s_SSR,x3sx3ns_SSR,x3nsx7s_SSR,x3sx7ns_SSR,x5x9_SSR)
+    return(SSR_dict,x3sx7s_SSR,x3sx3ns_SSR,x3nsx7s_SSR,x3sx7ns_SSR,x5x9_SSR,end_val)
 
 def input_params(net, params):
     net.input_weights(params[0])
@@ -130,7 +132,7 @@ def test_net(soc, init_val, params):
     net.hardcoded_params(params,init_val)
     net.build_dyad()
     net.plug_parameters()
-    net.record_interaction(time=450)
+    net.record_interaction(time=350)
     return net
 
 def compare_nets(net1,net2):
