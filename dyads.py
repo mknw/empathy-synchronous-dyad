@@ -78,22 +78,30 @@ import numpy as np
 
 def ssr(soc_dyad, nonsoc_dyad):
     x5ls = []
-    x3sx7s_SSR = 0
-    x3sx3ns_SSR = 0
-    x3nsx7s_SSR = 0
-    x3sx7ns_SSR = 0
     x5x9_SSR = 0
     end_val ={}
     SSR_dict = {}
+    weiSSR_dict ={}
     social_weiTL_x3x4 = list(soc_dyad.get_edge_data('X3', 'X4')[0]['weightTimeLine'].values())
     nonsocial_weiTL_x3x4 = list(nonsoc_dyad.get_edge_data('X3', 'X4')[0]['weightTimeLine'].values())
     social_weiTL_x7x8 = list(soc_dyad.get_edge_data('X7', 'X8')[0]['weightTimeLine'].values())
     nonsocial_weiTL_x7x8 = list(nonsoc_dyad.get_edge_data('X7', 'X8')[0]['weightTimeLine'].values())
+    social_weiTL_x9x3 = list(soc_dyad.get_edge_data('X9', 'X3')[0]['weightTimeLine'].values())
+    nonsocial_weiTL_x9x3 = list(nonsoc_dyad.get_edge_data('X9', 'X3')[0]['weightTimeLine'].values())
+    social_weiTL_x5x7 = list(soc_dyad.get_edge_data('X5', 'X7')[0]['weightTimeLine'].values())
+    nonsocial_weiTL_x5x7 = list(nonsoc_dyad.get_edge_data('X5', 'X7')[0]['weightTimeLine'].values())
+    
 
-    x3sx7s_SSR = np.sum((np.array(social_weiTL_x3x4)[:] - np.array(social_weiTL_x7x8)[:]) ** 2)
-    x3sx3ns_SSR = np.sum( (np.array(social_weiTL_x3x4)[:] - np.array(nonsocial_weiTL_x3x4)[:]) ** 2)
-    x3nsx7s_SSR = np.sum( (np.array(nonsocial_weiTL_x3x4)[:] - np.array(social_weiTL_x7x8)[:]) ** 2)
-    x3sx7ns_SSR = np.sum( (np.array(social_weiTL_x3x4)[:] - np.array(nonsocial_weiTL_x7x8)[:]) ** 2)
+    weiSSR_dict['x3x4sx7x8s'] = np.sum((np.array(social_weiTL_x3x4)[:] - np.array(social_weiTL_x7x8)[:]) ** 2)
+    weiSSR_dict['x3x4sx3x4ns'] = np.sum( (np.array(social_weiTL_x3x4)[:] - np.array(nonsocial_weiTL_x3x4)[:]) ** 2)
+    weiSSR_dict['x3x4nsx7x8s'] = np.sum( (np.array(nonsocial_weiTL_x3x4)[:] - np.array(social_weiTL_x7x8)[:]) ** 2)
+    weiSSR_dict['x3x4sx7x8ns'] = np.sum( (np.array(social_weiTL_x3x4)[:] - np.array(nonsocial_weiTL_x7x8)[:]) ** 2)
+    weiSSR_dict['x7x8sx7x8ns'] = np.sum( (np.array(social_weiTL_x7x8)[:] - np.array(nonsocial_weiTL_x7x8)[:]) ** 2)
+    weiSSR_dict['x9x3sx9x3ns'] = np.sum( (np.array(social_weiTL_x9x3)[:] - np.array(nonsocial_weiTL_x9x3)[:]) ** 2)
+    weiSSR_dict['x5x7sx5x7ns'] = np.sum( (np.array(social_weiTL_x5x7)[:] - np.array(nonsocial_weiTL_x5x7)[:]) ** 2)
+    weiSSR_dict['x9x3sx5x7ns'] = np.sum( (np.array(social_weiTL_x9x3)[:] - np.array(nonsocial_weiTL_x5x7)[:]) ** 2)
+    
+    
     for vrtx in soc_dyad.nodes():
        social_actTL = np.array(list(soc_dyad.node[vrtx]['activityTimeLine'].values()))
        nonsocial_actTL = np.array(list(nonsoc_dyad.node[vrtx]['activityTimeLine'].values()))
@@ -106,8 +114,22 @@ def ssr(soc_dyad, nonsoc_dyad):
            for act in range(len(social_actTL)):
                x5x9_SSR += (social_actTL[act] - x5ls[act])**2
        end_val[vrtx] = (social_actTL[-1],nonsocial_actTL[-1])
-    print (SSR_dict)
-    return(SSR_dict,x3sx7s_SSR,x3sx3ns_SSR,x3nsx7s_SSR,x3sx7ns_SSR,x5x9_SSR,end_val)
+#    print (SSR_dict)
+    return(SSR_dict,weiSSR_dict,x5x9_SSR,end_val)
+    
+def ssr_within_dyad(dyad):
+    p_ssr= 0
+    dyad = dyad.dyad
+    vrtxs = []
+    for vrtx in dyad.nodes():
+       vrtxs.append(vrtx)
+    vrtxs = vrtxs[1:]
+    for vrtx in range(len(vrtxs[1:5])):
+       p1_actTL = np.array(list(dyad.node[vrtxs[vrtx]]['activityTimeLine'].values()))
+       p2_actTL = np.array(list(dyad.node[vrtxs[vrtx+4]]['activityTimeLine'].values()))
+       for act in range(len(p1_actTL)):
+           p_ssr += (p1_actTL[act]-p2_actTL[act])**2
+    return p_ssr
 
 def input_params(net, params):
     net.input_weights(params[0])

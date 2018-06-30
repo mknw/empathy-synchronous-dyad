@@ -17,7 +17,7 @@ from math import ceil
 
 class syncNet(object):
 
-   def __init__(self, name,soc=1):
+   def __init__(self, name,soc):
       if soc == 1:
           self.file ="data/socialtapping_V5-final.xlsx"
       else:
@@ -115,38 +115,38 @@ class syncNet(object):
        comb = self.comb_par_df
        adcon = self.adcon_par_df
 #       print (weights)
-       weights.loc['X2']['X4']=params[0][0]
-#       weights.loc['X3']['X4']=params[0][3]
-       weights.loc['X3']['X4']=0.6
-       weights.loc['X4']['X3']=params[0][1]
-       weights.loc['X4']['X5']=params[0][2]
-#       weights.loc['X5']['X7']=params[0][4]
-       weights.loc['X5']['X7']=0.6
-       weights.loc['X6']['X8']=params[0][0]
-#       weights.loc['X7']['X8']=params[0][5]
-       weights.loc['X7']['X8']=0.6
-       weights.loc['X8']['X7']=params[0][2]
-       weights.loc['X8']['X9']=params[0][3]
-#       weights.loc['X9']['X3']=params[0][6]
-       weights.loc['X9']['X3']=0.6
-#       print (weights)
-#       print (speed)
-       speed.loc['speed_factor']['X2']=params[1][0]
-       speed.loc['speed_factor']['X3']=params[1][1]
-       speed.loc['speed_factor']['X4']=params[1][2]
-       speed.loc['speed_factor']['X5']=params[1][3]
-       speed.loc['speed_factor']['X6']=params[1][0]
-       speed.loc['speed_factor']['X7']=params[1][1]
-       speed.loc['speed_factor']['X8']=params[1][2]
-       speed.loc['speed_factor']['X9']=params[1][3]
+#       weights.loc['X2']['X4']=params[0][0]
+##       weights.loc['X3']['X4']=params[0][3]
+#       weights.loc['X3']['X4']=0.8
+#       weights.loc['X4']['X3']=params[0][1]
+#       weights.loc['X4']['X5']=params[0][2]
+##       weights.loc['X5']['X7']=params[0][4]
+#       weights.loc['X5']['X7']=0.3
+#       weights.loc['X6']['X8']=params[0][0]
+##       weights.loc['X7']['X8']=params[0][5]
+#       weights.loc['X7']['X8']=0.8
+#       weights.loc['X8']['X7']=params[0][2]
+#       weights.loc['X8']['X9']=params[0][3]
+##       weights.loc['X9']['X3']=params[0][6]
+#       weights.loc['X9']['X3']=0.3
+##       print (weights)
+##       print (speed)
+#       speed.loc['speed_factor']['X2']=params[1][0]
+#       speed.loc['speed_factor']['X3']=params[1][1]
+#       speed.loc['speed_factor']['X4']=params[1][2]
+#       speed.loc['speed_factor']['X5']=params[1][3]
+#       speed.loc['speed_factor']['X6']=params[1][0]
+#       speed.loc['speed_factor']['X7']=params[1][1]
+#       speed.loc['speed_factor']['X8']=params[1][2]
+#       speed.loc['speed_factor']['X9']=params[1][3]
 #       print (speed)
 #       print(comb)
-       comb.set_value(comb.index[3],comb.columns[3],params[3][0]*3)
-       comb.set_value(comb.index[3],comb.columns[7],params[3][0]*3)
-       comb.set_value(comb.index[9],comb.columns[2],params[3][1]*50)
-       comb.set_value(comb.index[9],comb.columns[6],params[3][1]*50)
-       comb.set_value(comb.index[10],comb.columns[2],params[3][2])
-       comb.set_value(comb.index[10],comb.columns[6],params[3][2])
+       comb.set_value(comb.index[3],comb.columns[3],params[2][0]*3)
+       comb.set_value(comb.index[3],comb.columns[7],params[2][0]*3)
+       comb.set_value(comb.index[9],comb.columns[2],params[2][1]*50)
+       comb.set_value(comb.index[9],comb.columns[6],params[2][1]*50)
+       comb.set_value(comb.index[10],comb.columns[2],params[2][2])
+       comb.set_value(comb.index[10],comb.columns[6],params[2][2])
 #       print (comb)
 #       print (adcon)
        adcon.set_value(adcon.index[2],adcon.columns[0],params[3][0])
@@ -385,34 +385,26 @@ if __name__ == '__main__':
         pd.read_pickle('speed_factors_df.pickle1'),
         pd.read_pickle('comb_par_df.pickle1'),
         pd.read_pickle('adcon_par_df.pickle1'),
-
         [float(n) for n in[1, 0, 0, 0, 0, 0, 0, 0, 0, 0]]]
 
     sync_dyad = syncNet('dyad',0) # CHANGE THIS TO PLOT THE RIGHT ONE
-#   sync_dyad.import_model()
     params = """
-0.2988037 , 0.94221047, 0.80408932, 0.86406199, 0.23765786,
-       0.50358239, 0.56301566, 0.65429594, 0.31189895, 0.35299369,
-       0.67449933, 0.18197258, 0.8568336 , 0.28998194, 0.17157816,
-       0.8037501 , 1.        , 0.74572098, 0.42070014, 0.47171025
+    0.11064310708628361, 0.4567073178035708, 1.0, 0.6841405329487925, 0.001, 0.10141499962307013, 0.8528811044782902, 0.5208573208808884, 0.3473652384237958, 0.9834138207080496, 0.2384753516587806, 0.06136401867603481, 0.6396586727879523, 0.07150800958254822, 0.04615631201067103, 0.41709255671744183, 0.7598875455282589, 0.7533286848206016, 0.4276496534464277, 0.0010063046286900212
 """
-
-    params = [float(n) for n in params.split()]
+    params = [float(n) for n in params.split(',')]
     wp = params[:7]
     sp = params[7:11]
     cp = params[11:14]
     ap = params[14:]
     formatted_params =[wp,sp,cp,ap]
     print (formatted_params)
-
 #    sync_dyad.import_model()
-    sync_dyad.hardcoded_params(formatted_params,init_val0)
+    sync_dyad.hardcoded_params(formatted_params,init_val1)
     sync_dyad.build_dyad()
     sync_dyad.plug_parameters()
-    sync_dyad.record_interaction(time=5000, delta=0.2)
+    sync_dyad.record_interaction(time=300, delta=0.2)
     sync_dyad.plot_activation()
     sync_dyad.plot_weights()
-
 
 #'''testing functions'''
 ##### NODES COLLECTION
