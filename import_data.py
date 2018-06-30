@@ -391,13 +391,13 @@ if __name__ == '__main__':
     sync_dyad = syncNet('dyad',0) # CHANGE THIS TO PLOT THE RIGHT ONE
 #   sync_dyad.import_model()
     params = """
-0.2988037 , 0.94221047, 0.80408932, 0.86406199, 0.23765786,
-       0.50358239, 0.56301566, 0.65429594, 0.31189895, 0.35299369,
-       0.67449933, 0.18197258, 0.8568336 , 0.28998194, 0.17157816,
-       0.8037501 , 1.        , 0.74572098, 0.42070014, 0.47171025
+0.06228467, 0.48908727, 0.20931008, 0.35909979, 0.33157945,
+       0.99409521, 0.33278341, 0.00135056, 0.53731928, 0.20758233,
+       0.31189825, 0.3395705 , 0.55675687, 0.5055475 , 0.00100012,
+       0.72745712, 0.56565876, 0.35077148, 0.77661382, 0.37891303
 """
 
-    params = [float(n) for n in params.split()]
+    params = [float(n) for n in params.split(',')]
     wp = params[:7]
     sp = params[7:11]
     cp = params[11:14]
@@ -409,7 +409,7 @@ if __name__ == '__main__':
     sync_dyad.hardcoded_params(formatted_params,init_val0)
     sync_dyad.build_dyad()
     sync_dyad.plug_parameters()
-    sync_dyad.record_interaction(time=5000, delta=0.2)
+    sync_dyad.record_interaction(time=300, delta=0.2)
     sync_dyad.plot_activation()
     sync_dyad.plot_weights()
 
