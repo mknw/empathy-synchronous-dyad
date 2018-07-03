@@ -30,40 +30,18 @@ def edges_update(graph, t, delta = 0.2):
         #speed_factor is different from states' speed_factor, as it's an attribute
         #  of the edge and not of the state
         if 'hebbian' in g[source_node][target_node][0]:
-#            print('hebbian:' + source_node + target_node)
-#            function = 'hebbian' # unnecessary
-            # persistence = g[source_node][target_node][0]['persistence']
-            # variation = speed_factor * (source * target * (1 - target) + persistence * target)
-
+            '''
+            ### deprecated version: ###
+            print('hebbian:' + source_node + target_node)
+            persistence = g[source_node][target_node][0]['persistence']
+            variation = speed_factor * (source * target * (1 - target) + persistence * target)
+            ###
+            '''
             # source for following hebbian algo: https://www.bonaccorso.eu/2017/08/21/ml-algorithms-addendum-hebbian-learning/
+            speed_factor = g[source_node][target_node][0]['speed_factor'] # consider this to be the learning rate
             scaler = StandardScaler(with_std=False)
-            # unsure whether this one below should be 'state' or 'activityTimeLine'
-            Xs = scaler.fit_transform(g[source_node]['state'].values())
-
-            # Compute eigenvalues and eigenvectors
-            Q = np.cov(Xs.T)
-            eigu, eigv = np.linalg.eig(Q)
-            if t == 0:
-                W_sanger = np.random.normal(scale=0.1, size=(2, 2))
-                prev_W_sanger = np.ones((2, 2))
-
-            learning_rate = g[source_node][target_node][0]['speed_factor'] # should be around 0.01
-
-            ### here for loop started in the original code.
-            prev_W_sanger = W_sanger.copy()
-            dw = np.zeros((2, 2))
-
-            for j in range(Xs.shape[0]):
-                Ysj = np.dot(W_sanger, Xs[j]).reshape((2, 1))
-                QYd = np.tril(np.dot(Ysj, Ysj.T))
-                dw += np.dot(Ysj, Xs[j].reshape((1, 2))) - np.dot(QYd, W_sanger)
-                # understand what to do with this derivative (pass it to dict?)
-
-            W_sanger += (learning_rate / t) * dw
-            ### here for loop ended in the original code
-
-            W_sanger /= np.linalg.norm(W_sanger, axis=1).reshape((2, 1))
-            new_weight = W_sanger
+            X = scaler.fit_transform(source)
+            variation = speed_factor * target * (X - old_weight * target)
 
 
         elif 'slhom' in g[source_node][target_node][0]:
@@ -111,10 +89,7 @@ def edges_update(graph, t, delta = 0.2):
 #
 #            exit(0)
 
-        new_weight = old_weight + speed_factor * (variation - old_weight )*delta # homophily model
-
-        #new_weight = new_weight if new_weight >= 0 else 0
-        #new_weight = new_weight if new_weight <= 1 else 1
+        new_weight = old_weight + speed_factor * (variation - old_weight )*delta
 
         try:
 
