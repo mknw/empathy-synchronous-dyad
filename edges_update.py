@@ -93,7 +93,7 @@ def edges_update(graph, t, delta = 0.2):
 
         try:
 
-            g[source_node][target_node][0]['weightTimeLine'].update({t:new_weight})
+            g[source_node][target_node][0]['weightTimeLine'].update({t:np.asscalar(new_weight)})
         except:
             print(t, source, target, g[source][target]['weightTimeLine'])
 
