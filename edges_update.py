@@ -39,9 +39,11 @@ def edges_update(graph, t, delta = 0.2):
             '''
             # source for following hebbian algo: https://www.bonaccorso.eu/2017/08/21/ml-algorithms-addendum-hebbian-learning/
             speed_factor = g[source_node][target_node][0]['speed_factor'] # consider this to be the learning rate
-            scaler = StandardScaler(with_std=False)
-            X = scaler.fit_transform(source)
-            variation = speed_factor * target * (X - old_weight * target)
+            # scaler = StandardScaler(with_std=False)
+            # X = scaler.fit_transform(source)
+            variation =  target * (source - old_weight * target)
+            new_weight = old_weight + speed_factor * (variation)*delta
+
 
 
         elif 'slhom' in g[source_node][target_node][0]:
@@ -51,6 +53,8 @@ def edges_update(graph, t, delta = 0.2):
             thres_h = g[source_node][target_node][0]['thres_t']
             amplification = g[source_node][target_node][0]['amplification']
             variation = old_weight + amplification * old_weight * (1 - old_weight) * (thres_h - np.abs(source - target))
+            print(variation)
+            new_weight = old_weight + speed_factor * (variation-old_weight)*delta
 
         else: #check if function str is falsy
             # feeds old_weight instead of new_weight to the weightTimeLine
@@ -89,13 +93,12 @@ def edges_update(graph, t, delta = 0.2):
 #
 #            exit(0)
 
-        new_weight = old_weight + speed_factor * (variation - old_weight )*delta
-
         try:
 
             g[source_node][target_node][0]['weightTimeLine'].update({t:np.asscalar(new_weight)})
         except:
-            print(t, source, target, g[source][target]['weightTimeLine'])
+            g[source_node][target_node][0]['weightTimeLine'].update({t:float(new_weight)})
+
 
         try:
             g[source_node][target_node][0]['weight'] = np.asscalar(new_weight)
