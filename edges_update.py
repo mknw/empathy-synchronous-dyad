@@ -42,7 +42,7 @@ def edges_update(graph, t, delta = 0.2):
             #previous function (do not uncomment)
             # variation =  target * (source - old_weight * target)
 
-            # s = g[source_node][target_node][0]['speed_factor'] # consider this to be the learning rate
+            speed_factor = g[source_node][target_node][0]['speed_factor'] # consider this to be the learning rate
             # recommended value for STD: 0.1
             s = 0.1
             # m = g[source_node][target_node][0]['persistence']
