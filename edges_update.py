@@ -46,10 +46,10 @@ def edges_update(graph, t, delta = 0.2):
             # recommended value for STD: s = 0.1
             s = 0.1
             lr = g[source_node][target_node][0]['persistence']
-            # recommended value for learning_rate: 0.05 < lr < 0.3
+            # recommended value for learning_rate: 0.005 < lr < 0.3
             act_diff = target - source
             variation = (1/(2*np.pi**2*s)*np.exp((-(act_diff/s))**2 / 2)) * lr - lr/4
-            new_weight = old_weight + speed_factor * (variation)*delta
+            new_weight = 1 / ( 1 + np.exp(-(old_weight + speed_factor * (variation)*delta))
 
 
         elif 'slhom' in g[source_node][target_node][0]:
