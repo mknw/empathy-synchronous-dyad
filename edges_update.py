@@ -26,7 +26,7 @@ def edges_update(graph, t, delta = 0.2):
         source = g.node[source_node]['state']
         target = g.node[target_node]['state']
 
-        #calculate weight according to attributes extracted from nx graph
+        #calculate weight according to attributes extracted from nx graphls
         #speed_factor is different from states' speed_factor, as it's an attribute
         #  of the edge and not of the state
         if 'hebbian' in g[source_node][target_node][0]:
@@ -37,13 +37,18 @@ def edges_update(graph, t, delta = 0.2):
             variation = speed_factor * (source * target * (1 - target) + persistence * target)
             ###
             '''
-            # source for following hebbian algo: https://www.bonaccorso.eu/2017/08/21/ml-algorithms-addendum-hebbian-learning/
-            speed_factor = g[source_node][target_node][0]['speed_factor'] # consider this to be the learning rate
-            # scaler = StandardScaler(with_std=False)
-            # X = scaler.fit_transform(source)
-            variation =  target * (source - old_weight * target)
-            new_weight = old_weight + speed_factor * (variation)*delta
 
+            # source for following hebbian algo: https://www.bonaccorso.eu/2017/08/21/ml-algorithms-addendum-hebbian-learning/
+            # s = g[source_node][target_node][0]['speed_factor'] # consider this to be the learning rate
+            # recommended value for STD: 0.1
+            s = 0.1
+            # m = g[source_node][target_node][0]['persistence']
+            # recommended value for m: 0.
+            m = 0
+            # variation =  target * (source - old_weight * target)
+            act_diff = target - source 
+            variation = (1/(2*np.pi**2*s)*np.exp((-(act_diff/s))**2 / 2)) - 0.1
+            new_weight = old_weight + speed_factor * (variation)*delta
 
 
         elif 'slhom' in g[source_node][target_node][0]:
