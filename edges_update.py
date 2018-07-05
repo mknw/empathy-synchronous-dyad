@@ -41,16 +41,14 @@ def edges_update(graph, t, delta = 0.2):
             # source for following hebbian algo: https://www.bonaccorso.eu/2017/08/21/ml-algorithms-addendum-hebbian-learning/
             #previous function (do not uncomment)
             # variation =  target * (source - old_weight * target)
-
+            ######################################################
             speed_factor = g[source_node][target_node][0]['speed_factor'] # consider this to be the learning rate
-            # recommended value for STD: 0.1
+            # recommended value for STD: s = 0.1
             s = 0.1
-            # m = g[source_node][target_node][0]['persistence']
-            # recommended value for m: 0.
-            m = 0
-
+            lr = g[source_node][target_node][0]['persistence']
+            # recommended value for learning_rate: 0.05 < lr < 0.3
             act_diff = target - source
-            variation = (1/(2*np.pi**2*s)*np.exp((-(act_diff/s))**2 / 2)) - 0.1
+            variation = (1/(2*np.pi**2*s)*np.exp((-(act_diff/s))**2 / 2)) * lr - lr/4
             new_weight = old_weight + speed_factor * (variation)*delta
 
 
