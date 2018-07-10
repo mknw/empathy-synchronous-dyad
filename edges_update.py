@@ -33,24 +33,14 @@ def edges_update(graph, t, delta = 0.2):
             '''
             ### deprecated version: ###
             print('hebbian:' + source_node + target_node)
-            persistence = g[source_node][target_node][0]['persistence']
             variation = speed_factor * (source * target * (1 - target) + persistence * target)
-            ###
             '''
-
-            # source for following hebbian algo: https://www.bonaccorso.eu/2017/08/21/ml-algorithms-addendum-hebbian-learning/
-            #previous function (do not uncomment)
-            # variation =  target * (source - old_weight * target)
-            ######################################################
-            speed_factor = g[source_node][target_node][0]['speed_factor'] # consider this to be the learning rate
-            # recommended value for STD: s = 0.1
-            s = 0.1
-            lr = g[source_node][target_node][0]['persistence']
-            # recommended value for learning_rate: 0.005 < lr < 0.3
-            act_diff = target - source
-            variation = (1/(2*np.pi**2*s)*np.exp((-(act_diff/s))**2 / 2)) * lr - lr/4
-            new_weight = 1 / ( 1 + np.exp(-(old_weight + speed_factor * (variation)*delta))
-
+            persistence = g[source_node][target_node][0]['persistence']
+            speed_factor = g[source_node][target_node][0]['speed_factor']
+            # new version
+            ### suggested persistence around: 0.95/0.98
+            variation = (source * target * (1 - old_weight) + persistence * old_weight - old_weight)
+            new_weight = old_weight + speed_factor * (variation-old_weight)*delta
 
         elif 'slhom' in g[source_node][target_node][0]:
 #            print('slhomophily:' + source_node + target_node)

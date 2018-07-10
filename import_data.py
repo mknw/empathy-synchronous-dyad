@@ -17,11 +17,14 @@ from math import ceil
 
 class syncNet(object):
 
-   def __init__(self, name,soc=1):
-      if soc == 1:
-          self.file ="data/socialtapping_V5-final.xlsx"
+   def __init__(self, name,soc=1, file = None):
+      if file == None:
+          if soc == 1:
+              self.file ="data/socialtapping_V5-final.xlsx"
+          else:
+              self.file ="data/nonsocialtapping_V5-final.xlsx"
       else:
-          self.file ="data/nonsocialtapping_V5-final.xlsx"
+          self.file = file
       self.name = name
       self.soc = soc
 
