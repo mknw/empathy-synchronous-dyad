@@ -17,29 +17,29 @@ import numpy as np
 #"""Create and prepare nx graphs through syncNet methods from import_data.py"""
 #
 ## social condition
-soc_syncNet = syncNet(name="soc_syncNet", file="data/socialtapping_V4-final.xlsx")
-
-soc_syncNet.import_model()
-# soc_syncNet.input_weights()
-soc_syncNet.build_dyad()
-soc_syncNet.plug_parameters()
-soc_syncNet.record_interaction(time=450)
-soc_syncNet.plot_activation()
-soc_syncNet.plot_weights()
-
-
-## nonsocial condition
-nonsoc_syncNet = syncNet(name="nonsoc_syncNet", file="data/nonsocialtapping_V4-final.xlsx")
-
-nonsoc_syncNet.import_model()
-#nonsoc_syncNet.input_weights()
-nonsoc_syncNet.build_dyad()
-nonsoc_syncNet.plug_parameters()
-nonsoc_syncNet.record_interaction(time=450)
-nonsoc_syncNet.plot_activation()
-nonsoc_syncNet.plot_weights()
+# soc_syncNet = syncNet(name="soc_syncNet", file="data/socialtapping_V4-final.xlsx")
 #
-import ipdb; ipdb.set_trace()
+# soc_syncNet.import_model()
+# # soc_syncNet.input_weights()
+# soc_syncNet.build_dyad()
+# soc_syncNet.plug_parameters()
+# soc_syncNet.record_interaction(time=450)
+# soc_syncNet.plot_activation()
+# soc_syncNet.plot_weights()
+#
+#
+# ## nonsocial condition
+# nonsoc_syncNet = syncNet(name="nonsoc_syncNet", file="data/nonsocialtapping_V4-final.xlsx")
+#
+# nonsoc_syncNet.import_model()
+# #nonsoc_syncNet.input_weights()
+# nonsoc_syncNet.build_dyad()
+# nonsoc_syncNet.plug_parameters()
+# nonsoc_syncNet.record_interaction(time=450)
+# nonsoc_syncNet.plot_activation()
+# nonsoc_syncNet.plot_weights()
+# #
+# import ipdb; ipdb.set_trace()
 #### assign NX GRAPHS created ( to  simplify following  code )
 #soc_dyad = soc_syncNet.dyad
 #
