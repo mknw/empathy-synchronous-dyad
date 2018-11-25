@@ -16,7 +16,7 @@ from edges_update import edges_update
 
 class syncNet(object):
 
-   def __init__(self, name, file='data/socialtapping_V3-final.xlsx'):
+   def __init__(self, name, file='data/socialtapping_V4-final.xlsx'):
       self.name = name
       #read excel
       template = pd.read_excel(file, [0,1])
@@ -219,63 +219,64 @@ class syncNet(object):
 
 
 if __name__ == '__main__':
-   sync_dyad = syncNet()
+   sync_dyad = syncNet('dyad')
    sync_dyad.import_model()
    sync_dyad.build_dyad()
    sync_dyad.plug_parameters()
    sync_dyad.record_interaction(time=30, delta=0.2)
-   sync_dyad.plot_timeline()
+   sync_dyad.plot_activation()
+   sync_dyad.plot_weights()
 
 
 '''testing functions'''
-#### NODES COLLECTION
-#sync_dyad.dyad.nodes()
-##
-### EDGES COLLECTION
-#sync_dyad.dyad.edges()
+# ### NODES COLLECTION
+# sync_dyad.dyad.nodes()
+# #
+# ## EDGES COLLECTION
+# sync_dyad.dyad.edges()
 #
-## FOR EACH NODE print NAME + NX NODE attribute 
-#for vrtx in sync_dyad.dyad.nodes():
+# # FOR EACH NODE print NAME + NX NODE attribute
+# for vrtx in sync_dyad.dyad.nodes():
 #   print(vrtx)
 #   print(sync_dyad.dyad.node[vrtx])
 #
-##
-#### for each EDGE print NAME, SUCCESSOR + EDGE attribute
-##print(list(sync_dyad.dyad.predecessors('X1')))
-#for vrtx in sync_dyad.dyad.nodes():
+# #
+# ### for each EDGE print NAME, SUCCESSOR + EDGE attribute
+# #print(list(sync_dyad.dyad.predecessors('X1')))
+# for vrtx in sync_dyad.dyad.nodes():
 #   for succ in sync_dyad.dyad.successors(vrtx):
 #      print(vrtx, succ)
 #      print(sync_dyad.dyad[vrtx][succ])
 #
 #
-### get specific NODE 
-#sync_dyad.dyad.node['X8']
+# ## get specific NODE
+# sync_dyad.dyad.node['X8']
 #
-### get specific EDGE
-#sync_dyad.dyad.get_edge_data('X2', 'X4')[0]
+# ## get specific EDGE
+# sync_dyad.dyad.get_edge_data('X2', 'X4')[0]
 #
-##
+# #
 #
-#sync_dyad.dyad['X3']['X4'][0]['weightTimeLine']
+# sync_dyad.dyad['X3']['X4'][0]['weightTimeLine']
 #
-### print NAME + edgeFUNCTION
-#g = sync_dyad.dyad
-#for e in g.edges():
+# ## print NAME + edgeFUNCTION
+# g = sync_dyad.dyad
+# for e in g.edges():
 #   orig, dest = e
 #   print("from " + orig + " to " + dest)
-#   
+#
 #   if 'hebbian' in g[orig][dest][0]:
 #      print("hebbian")
 #   elif 'slhom' in g[orig][dest][0]:
 #      print("slhom")
 #   else:
 #      print("no change in weight")
-#      
-### UPDATE function, works only when assigning sync_dyad.dyad to a var (g)
-#vrtx = 'X7'
-#t = 30
-#actual_state = 1
-#g.node[vrtx]['activityTimeLine'].update({t: actual_state})
-#g.node['X7']['activityTimeLine'][30] = 0.5
-#g.get_edge_data(source_node,target_node)[0]['weight'] = np.asscalar(new_weight) 
-###################################
+#
+# ## UPDATE function, works only when assigning sync_dyad.dyad to a var (g)
+# vrtx = 'X7'
+# t = 30
+# actual_state = 1
+# g.node[vrtx]['activityTimeLine'].update({t: actual_state})
+# g.node['X7']['activityTimeLine'][30] = 0.5
+# g.get_edge_data(source_node,target_node)[0]['weight'] = np.asscalar(new_weight)
+# ##################################
